@@ -43,11 +43,7 @@ int main()
     if (!findAndConnect(device))
         return -1;
 
-    auto start = system_clock::now();
     mmind::api::ColorMap color;
-    auto end = system_clock::now();
-    auto duration = duration_cast<microseconds>(end - start);
-    std::cout << "Capture time is " << duration << " mius." << std::endl;
     showError(device.captureColorMap(color));
     const std::string colorFile = "ColorMap.png";
     saveMap(color, colorFile);
