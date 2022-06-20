@@ -34,6 +34,9 @@
 #include "MechEyeApi.h"
 #include "SampleUtil.h"
 #include "OpenCVUtil.h"
+#include <chrono>
+using namespace std;
+using namespace chrono;
 
 int main()
 {
@@ -42,9 +45,50 @@ int main()
         return -1;
 
     mmind::api::DepthMap depth;
-    showError(device.captureDepthMap(depth));
+    mmind::api::ColorMap color;
+
+    // New way for counting time
+    //vector<double> tCount;
+    //int i = 0;
+    //while (i < 15) {
+    //    auto start = system_clock::now();
+    //    showError(device.captureDepthMap(depth));
+    //    auto end = system_clock::now();
+    //    auto duration = duration_cast<microseconds>(end - start);
+    //    std::cout << "Capture time is " << double(duration.count()) << " mius." << std::endl;
+    //    tCount.push_back(double(duration.count()));
+    //    i++;
+    //}
+    //double sum = 0.0;
+    //for (int i = 5; i < 15; i++) {
+    //    sum += tCount[i];
+    //}
+    //double ave_time = sum / 10.0;
+    //std::cout << "(NEW METHOD) Average captureDepthMap: " << ave_time << " mius." << std::endl;
+    
+    // Classic way for counting time
+    vector<double> timeCount;
+    int i = 0;
+    while (i < 15) {
+        clock_t start, end;
+        start = clock();
+        showError(device.captureDepthMap(depth));
+        showError(device.captureColorMap(color));
+        end = clock();
+        std::cout << "captureDepthMap: " << (double)(end - start) << "ms" << std::endl;
+        timeCount.push_back((double)(end - start));
+        i++;
+    }
+    double sum = 0.0;
+    for (int i = 5; i < 15; i++) {
+        sum += timeCount[i];
+    }
+    double ave_time = sum / 10.0;
+    std::cout << "Average captureDepthMap: " << ave_time << "ms" << std::endl;
+
+    // Other works
     const std::string depthFile = "DepthMap.png";
-    saveMap(depth, depthFile);
+    //saveMap(depth, depthFile);
 
     device.disconnect();
     std::cout << "Disconnected from the Mech-Eye device successfully." << std::endl;
